@@ -1,0 +1,13 @@
+# Core Dependencies - المتطلبات الأساسية
+pandas>=1.5.0
+numpy>=1.23.0
+matplotlib>=3.6.0
+seaborn>=0.12.0
+
+# AI/ML Dependencies - مكتبات الذكاء الاصطناعي
+scikit-learn>=1.2.0
+
+# Optional Advanced Features - ميزات متقدمة اختيارية
+# openpyxl>=3.0.10  # For Excel export
+# python-docx>=0.8.11  # For Word reports
+# reportlab>=3.6.0  # For PDF reports
