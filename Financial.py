@@ -174,15 +174,18 @@ def generate_advanced_salla_data():
             'هامش_الربح_%': margin_pct,
             'المدينة': random.choices(cities, weights=city_weights, k=1)[0],
             'الساعة': hour,
-            'اليوم': date_time.strftime('%A'),
             'الشهر': date_time.month,
-            'اسم_الشهر': date_time.strftime('%B'),
         })
     
     df = pd.DataFrame(data)
     
     # إضافة معلومات إضافية
     df['التاريخ'] = df['التاريخ_والوقت']  # إضافة اسم مختصر للاستخدام في AI functions
+    
+    # استخدام pandas لأسماء الأيام (يدعم اللغات المختلفة بشكل أفضل)
+    df['اليوم'] = pd.to_datetime(df['التاريخ_والوقت']).dt.day_name()
+    df['اسم_الشهر'] = pd.to_datetime(df['التاريخ_والوقت']).dt.month_name()
+    
     df['الربع'] = df['الشهر'].apply(lambda x: f'Q{(x-1)//3 + 1}')
     df['نهاية_الأسبوع'] = df['التاريخ_والوقت'].dt.dayofweek.isin([4, 5])
     
