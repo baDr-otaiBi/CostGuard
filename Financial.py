@@ -815,19 +815,20 @@ def ai_anomaly_detection(df):
     print("\n[AI-3/6] 🔍 كشف الحالات الشاذة في المبيعات...")
     
     try:
-        # إعداد البيانات
-        features = df[['سعر_الوحدة', 'الكمية', 'إجمالي_المبيعات', 'صافي_الربح', 'هامش_الربح_%']]
+        # إعداد البيانات - نعمل على نسخة لتجنب تعديل البيانات الأصلية
+        df_copy = df.copy()
+        features = df_copy[['سعر_الوحدة', 'الكمية', 'إجمالي_المبيعات', 'صافي_الربح', 'هامش_الربح_%']]
         
         # تطبيق Isolation Forest
         iso_forest = IsolationForest(contamination=0.1, random_state=42)
-        df['شاذة'] = iso_forest.fit_predict(features)
+        df_copy['شاذة'] = iso_forest.fit_predict(features)
         
         # الحالات الشاذة هي -1
-        anomalies = df[df['شاذة'] == -1].copy()
-        normal = df[df['شاذة'] == 1].copy()
+        anomalies = df_copy[df_copy['شاذة'] == -1].copy()
+        normal = df_copy[df_copy['شاذة'] == 1].copy()
         
-        print(f"   ✅ تم فحص {len(df)} معاملة")
-        print(f"   ⚠️  تم اكتشاف {len(anomalies)} حالة شاذة ({len(anomalies)/len(df)*100:.2f}%)")
+        print(f"   ✅ تم فحص {len(df_copy)} معاملة")
+        print(f"   ⚠️  تم اكتشاف {len(anomalies)} حالة شاذة ({len(anomalies)/len(df_copy)*100:.2f}%)")
         
         if len(anomalies) > 0:
             print(f"   📊 متوسط قيمة الحالات الشاذة: {anomalies['إجمالي_المبيعات'].mean():,.0f} ريال")
@@ -836,10 +837,10 @@ def ai_anomaly_detection(df):
         return {
             'status': 'success',
             'total_anomalies': len(anomalies),
-            'anomaly_percentage': float(len(anomalies)/len(df)*100),
+            'anomaly_percentage': float(len(anomalies)/len(df_copy)*100),
             'anomaly_total_value': float(anomalies['إجمالي_المبيعات'].sum()) if len(anomalies) > 0 else 0,
             'top_anomalies': anomalies.nlargest(5, 'إجمالي_المبيعات')[
-                ['رقم_الطلب', 'المنتج', 'إجمالي_المبيعات', 'الربح']
+                ['رقم_الطلب', 'المنتج', 'إجمالي_المبيعات', 'صافي_الربح']
             ].to_dict('records')
         }
     except Exception as e:
